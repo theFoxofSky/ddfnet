@@ -15,7 +15,7 @@ Please refer to our [project page](https://thefoxofsky.github.io/project_pages/d
 
 ## Model Zoo
 
-Will be avaliable soon
+Will be avaliable soon.
 
 ## Usage
 
@@ -130,18 +130,18 @@ python test_time.py
 ```
 ## Acknowledgement
 
-Codebase from [pytorch-image-models](https://github.com/rwightman/pytorch-image-models)
+Codebase from [pytorch-image-models](https://github.com/rwightman/pytorch-image-models).
 
 ## Citation
 
-If you find this code useful for your research, please cite our paper
+If you find this code useful for your research, please cite our paper.
 
 ```
 @inproceedings{zhou_ddf_cvpr_2021,
-                    title = {Decoupled Dynamic Filter Networks},
-                    author = {Zhou, Jingkai and Jampani, Varun and Pi, Zhixiong and Liu, Qiong and Yang, Ming-Hsuan},
-                    booktitle = { IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
-                    month = jun,
-                    year = {2021}
-                }
+               title = {Decoupled Dynamic Filter Networks},
+               author = {Zhou, Jingkai and Jampani, Varun and Pi, Zhixiong and Liu, Qiong and Yang, Ming-Hsuan},
+               booktitle = { IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
+               month = jun,
+               year = {2021}
+               }
 ```
