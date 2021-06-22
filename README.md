@@ -140,7 +140,7 @@ If you find this code useful for your research, please cite our paper.
 @inproceedings{zhou_ddf_cvpr_2021,
                title = {Decoupled Dynamic Filter Networks},
                author = {Zhou, Jingkai and Jampani, Varun and Pi, Zhixiong and Liu, Qiong and Yang, Ming-Hsuan},
-               booktitle = { IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
+               booktitle = {IEEE/CVF Conf. on Computer Vision and Pattern Recognition (CVPR)},
                month = jun,
                year = {2021}
                }
