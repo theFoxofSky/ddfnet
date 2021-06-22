@@ -106,3 +106,4 @@ venv.bak/
 *.gz
 Untitled.ipynb
 Testing notebook.ipynb
+.DS_Store
