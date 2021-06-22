@@ -60,7 +60,7 @@ pip install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp
 - Install other requirements:
 
 ```bash
-pip install pyyaml
+pip install pyyaml ipdb
 ```
 - Build the ddf operation:
 
