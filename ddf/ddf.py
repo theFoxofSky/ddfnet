@@ -150,7 +150,7 @@ class FilterNorm(nn.Module):
         if self.filter_type == 'spatial':
             b, c, h, w = x.size()
             x = x - x.mean(dim=1).view(b, 1, h, w)
-            x = x / (x.std(dim=1).view(b, 1, h, w) + 1e-20)
+            x = x / (x.std(dim=1).view(b, 1, h, w) + 1e-10)
             if self.runing_std:
                 x = x * self.std[None, :, None, None]
             else:
@@ -162,7 +162,7 @@ class FilterNorm(nn.Module):
             c = self.in_channels
             x = x.view(b, c, -1)
             x = x - x.mean(dim=2).view(b, c, 1)
-            x = x / (x.std(dim=2).view(b, c, 1) + 1e-20)
+            x = x / (x.std(dim=2).view(b, c, 1) + 1e-10)
             x = x.view(b, -1)
             if self.runing_std:
                 x = x * self.std[None, :]
