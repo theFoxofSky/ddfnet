@@ -73,7 +73,7 @@ mv build/lib*/* .
 - Verify the ddf operation:
 
 ```bash
-cd <path_of_ddfnet>
+cd <path_to_ddfnet>
 python grad_check.py
 ```
 
@@ -109,7 +109,7 @@ We use standard ImageNet dataset, you can download it from http://image-net.org/
 To train a model, for example `ddf_mul_resnet50`, on ImageNet from scratch with 8 RTX 2080Ti, run:
 
 ```bash
-./distributed_train.sh 8 <path_of_imagenet> --model ddf_mul_resnet50 --lr 0.4 \
+./distributed_train.sh 8 <path_to_imagenet> --model ddf_mul_resnet50 --lr 0.4 \
 --warmup-epochs 5 --epochs 120 --sched cosine -b 128 -j 6 --amp --dist-bn reduce
 ```
 
@@ -118,7 +118,7 @@ To train a model, for example `ddf_mul_resnet50`, on ImageNet from scratch with 
 To evaluate a pre-trained model, for example `ddf_mul_resnet50`, on ImageNet val, run:
 
 ```bash
-python validate.py <path_of_imagenet> --model ddf_mul_resnet50 --checkpoint <path_of_checkpoint>
+python validate.py <path_to_imagenet> --model ddf_mul_resnet50 --checkpoint <path_to_checkpoint>
 ```
 
 ### Inference Time
