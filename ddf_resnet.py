@@ -1,3 +1,6 @@
+"""
+Copyright 2021 Jingkai Zhou
+"""
 import math
 import torch.nn as nn
 
