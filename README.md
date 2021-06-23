@@ -13,7 +13,7 @@ the convolution operation at a single position. ‘GAP’ means the global avera
 
 Please refer to our [project page](https://thefoxofsky.github.io/project_pages/ddf) and [paper](https://arxiv.org/abs/2104.14107) for more details.
 
-## Model Zoo
+## Model zoo
 
 Will be avaliable soon.
 
