@@ -128,6 +128,12 @@ To measure the inference time, run:
 ```bash
 python test_time.py
 ```
+
+### Use ddf in other place as a basic building layer
+
+Please directly copy the ddf folder to your repo and rebuild the ddf operation following the instructions above.
+Then, you can easily import the ddf, DDFModule, and DDFUpModule.
+
 ## Acknowledgement
 
 Codebase from [pytorch-image-models](https://github.com/rwightman/pytorch-image-models).
