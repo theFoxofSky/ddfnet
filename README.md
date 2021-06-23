@@ -121,7 +121,7 @@ To evaluate a pre-trained model, for example `ddf_mul_resnet50`, on ImageNet val
 python validate.py <path_to_imagenet> --model ddf_mul_resnet50 --checkpoint <path_to_checkpoint>
 ```
 
-### Inference Time
+### Inference time
 
 To measure the inference time, run:
 
