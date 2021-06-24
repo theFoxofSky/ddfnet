@@ -134,7 +134,7 @@ python test_time.py
 Please directly copy the ddf folder to your repo and rebuild the ddf operation following the instructions above.
 Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
 
-Also, you can design your own module with the ddf operation.
+You can design your own module with the ddf operation.
 
 For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1.
 
