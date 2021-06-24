@@ -132,7 +132,24 @@ python test_time.py
 ### Use ddf in other places as a basic building layer
 
 Please directly copy the ddf folder to your repo and rebuild the ddf operation following the instructions above.
-Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. Also, you can design your own module with the ddf operation.
+Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
+
+Also, you can design your own module with the ddf operation.
+
+For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1.
+
+```python
+channel_dynamic_filter = torch.ones(filter_size)
+```
+
+Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1.
+
+
+```python
+spatial_dynamic_filter = torch.ones(filter_size)
+```
+
+Almost all exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented with our ddf operation. Have fun exploring.
 
 ## Acknowledgement
 
