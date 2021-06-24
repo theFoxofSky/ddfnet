@@ -136,13 +136,13 @@ Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack.
 
 You can design your own module with the ddf operation.
 
-For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1.
+For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1 for 'mul' combination or 0 for 'add' combination.
 
 ```python
 channel_dynamic_filter = torch.ones(filter_size)
 ```
 
-Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1.
+Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1 for 'mul' combination or 0 for 'add' combination.
 
 
 ```python
