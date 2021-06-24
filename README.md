@@ -139,14 +139,32 @@ You can design your own module with the ddf operation.
 For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1 for 'mul' combination or 0 for 'add' combination.
 
 ```python
-channel_dynamic_filter = torch.ones(filter_size)
+channel_filter = torch.ones(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'mul')
+```
+or
+
+```python
+channel_filter = torch.zeros(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'add')
 ```
 
 Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1 for 'mul' combination or 0 for 'add' combination.
 
 
 ```python
-spatial_dynamic_filter = torch.ones(filter_size)
+spatial_filter = torch.ones(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'mul')
+```
+or
+
+```python
+spatial_filter = torch.zeros(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'add')
 ```
 
 Almost all exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented with our ddf operation. Have fun exploring.
