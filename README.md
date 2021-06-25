@@ -129,7 +129,7 @@ To measure the inference time, run:
 python test_time.py
 ```
 
-### Use ddf in other places as a basic building layer
+## Use ddf in other places as a basic building layer
 
 Please directly copy the ddf folder to your repo and rebuild the ddf operation following the instructions above.
 Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
