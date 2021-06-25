@@ -1,6 +1,6 @@
 # Decoupled Dynamic Filter Networks
 
-This repo is the official implementation of "Decoupled Dynamic Filter Networks".
+This repo is the official implementation of CVPR2021 paper: "Decoupled Dynamic Filter Networks".
 
 ## Introduction
 DDF is an alternative of convolution which decouples dynamic filters into spatial and channel filters.
