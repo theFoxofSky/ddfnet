@@ -19,8 +19,10 @@ Please refer to our [project page](https://thefoxofsky.github.io/project_pages/d
 | :---              |  :---:  |    :---:    |    :---:   |   :---:  |  :---:  |
 | ddf_mul_resnet50  |  16.8M  | ImageNet 1K |     224    |   79.1   | [google]() / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
 | ddf_mul_resnet101 |  28.1M  | ImageNet 1K |     224    |   80.4   | [google]() / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
-| ddf_mul_resnet50  |  16.8M  | ImageNet 1K |     224    |   78.7   | [google]() / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
-| ddf_mul_resnet50  |  28.1M  | ImageNet 1K |     224    |  coming soon | coming soon |
+| ddf_add_resnet50  |  16.8M  | ImageNet 1K |     224    |   78.7   | [google]() / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
+| ddf_add_resnet101 |  28.1M  | ImageNet 1K |     224    |  coming soon | coming soon |
+
+The code for baidu is `vub3`
 
 ## Usage
 
