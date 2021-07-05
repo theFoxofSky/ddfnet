@@ -23,6 +23,9 @@ from timm.models import create_model, apply_test_time_pool, load_checkpoint, is_
 from timm.data import create_dataset, create_loader, resolve_data_config, RealLabelsImagenet
 from timm.utils import accuracy, AverageMeter, natural_key, setup_default_logging, set_jit_legacy
 
+# register models
+import ddf_resnet
+
 has_apex = False
 try:
     from apex import amp
