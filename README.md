@@ -62,7 +62,7 @@ output = ddf(input, channel_filter, spatial_filter,
              kernel_size, dilation, stride, head, 'add')
 ```
 
-Almost all exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented with our ddf operation. Have fun exploring.
+Almost ALL exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented by our ddf operation. Have fun exploring.
 
 ## Install
 
