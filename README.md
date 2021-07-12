@@ -24,9 +24,47 @@ Please refer to our [project page](https://thefoxofsky.github.io/project_pages/d
 
 The code for baidu is `vub3`
 
-## Usage
+## Use ddf in other places as a basic building layer
 
-### Install
+Please directly copy the ddf folder to your repo and build the ddf operation.
+Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
+
+You can design your own module with the ddf operation.
+
+For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1 for 'mul' combination or 0 for 'add' combination.
+
+```python
+channel_filter = torch.ones(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'mul')
+```
+or
+
+```python
+channel_filter = torch.zeros(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'add')
+```
+
+Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1 for 'mul' combination or 0 for 'add' combination.
+
+
+```python
+spatial_filter = torch.ones(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'mul')
+```
+or
+
+```python
+spatial_filter = torch.zeros(filter_size)
+output = ddf(input, channel_filter, spatial_filter,
+             kernel_size, dilation, stride, head, 'add')
+```
+
+Almost all exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented with our ddf operation. Have fun exploring.
+
+## Install
 
 - Clone this repo:
 
@@ -84,7 +122,7 @@ cd <path_to_ddfnet>
 python grad_check.py
 ```
 
-### Data preparation
+## Data preparation
 
 We use standard ImageNet dataset, you can download it from http://image-net.org/. Please prepare it under the following file structure:
   ```bash
@@ -111,7 +149,7 @@ We use standard ImageNet dataset, you can download it from http://image-net.org/
  
   ```
 
-### Training from scratch
+## Training from scratch
 
 To train a model, for example `ddf_mul_resnet50`, on ImageNet from scratch with 8 RTX 2080Ti, run:
 
@@ -120,7 +158,7 @@ To train a model, for example `ddf_mul_resnet50`, on ImageNet from scratch with 
 --warmup-epochs 5 --epochs 120 --sched cosine -b 128 -j 6 --amp --dist-bn reduce
 ```
 
-### Evaluation
+## Evaluation
 
 To evaluate a pre-trained model, for example `ddf_mul_resnet50`, on ImageNet val, run:
 
@@ -128,53 +166,13 @@ To evaluate a pre-trained model, for example `ddf_mul_resnet50`, on ImageNet val
 python validate.py <path_to_imagenet> --model ddf_mul_resnet50 --checkpoint <path_to_checkpoint>
 ```
 
-### Inference time
+## Inference time
 
 To measure the inference time, run:
 
 ```bash
 python test_time.py
 ```
-
-## Use ddf in other places as a basic building layer
-
-Please directly copy the ddf folder to your repo and rebuild the ddf operation following the instructions above.
-Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
-
-You can design your own module with the ddf operation.
-
-For example, you can get a carafe/involution-like module by fixing all values in the channel filter to 1 for 'mul' combination or 0 for 'add' combination.
-
-```python
-channel_filter = torch.ones(filter_size)
-output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'mul')
-```
-or
-
-```python
-channel_filter = torch.zeros(filter_size)
-output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'add')
-```
-
-Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1 for 'mul' combination or 0 for 'add' combination.
-
-
-```python
-spatial_filter = torch.ones(filter_size)
-output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'mul')
-```
-or
-
-```python
-spatial_filter = torch.zeros(filter_size)
-output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'add')
-```
-
-Almost all exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented with our ddf operation. Have fun exploring.
 
 ## Acknowledgement
 
