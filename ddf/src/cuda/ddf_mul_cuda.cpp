@@ -33,7 +33,7 @@ int DDFMulBackwardLauncher(
 
 int ddf_mul_forward_cuda(
     at::Tensor features,at::Tensor channel_filter, at::Tensor spatial_filter,
-    int kernel_size, int dilation, int stride, int head, at::Tensor output){
+    int kernel_size, int dilation, int stride, at::Tensor output){
     CHECK_INPUT(features);
     CHECK_INPUT(channel_filter);
     CHECK_INPUT(spatial_filter);

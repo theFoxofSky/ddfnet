@@ -22,7 +22,7 @@ int DDFMulFasterForwardLauncher(
 
 int ddf_mul_faster_forward_cuda(
     at::Tensor features,at::Tensor channel_filter, at::Tensor spatial_filter,
-    int kernel_size, int dilation, int stride, int head, at::Tensor output){
+    int kernel_size, int dilation, int stride, at::Tensor output){
     CHECK_INPUT(features);
     CHECK_INPUT(channel_filter);
     CHECK_INPUT(spatial_filter);
@@ -36,7 +36,6 @@ int ddf_mul_faster_forward_cuda(
     const int top_height = output.size(2);
     const int top_width = output.size(3);
 
-    //TODO: use head
     DDFMulFasterForwardLauncher(features, channel_filter, spatial_filter,
                                 kernel_size, dilation, stride,
                                 batch_size, channels,

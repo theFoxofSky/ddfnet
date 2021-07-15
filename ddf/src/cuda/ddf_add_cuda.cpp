@@ -33,7 +33,7 @@ int DDFAddBackwardLauncher(
 
 int ddf_add_forward_cuda(
     at::Tensor features,at::Tensor channel_filter, at::Tensor spatial_filter,
-    int kernel_size, int dilation, int stride, int head, at::Tensor output){
+    int kernel_size, int dilation, int stride, at::Tensor output){
     CHECK_INPUT(features);
     CHECK_INPUT(channel_filter);
     CHECK_INPUT(spatial_filter);
@@ -47,7 +47,6 @@ int ddf_add_forward_cuda(
     const int top_height = output.size(2);
     const int top_width = output.size(3);
 
-    //TODO: use head
     DDFAddForwardLauncher(features, channel_filter, spatial_filter,
                           kernel_size, dilation, stride,
                           batch_size, channels,
@@ -60,7 +59,7 @@ int ddf_add_forward_cuda(
 int ddf_add_backward_cuda(
     at::Tensor top_grad, at::Tensor features,
     at::Tensor channel_filter, at::Tensor spatial_filter,
-    int kernel_size, int dilation, int stride, int head,
+    int kernel_size, int dilation, int stride,
     at::Tensor rtop_grad, at::Tensor rbottom_grad,
     at::Tensor rspatial_filter_grad, at::Tensor bottom_grad,
     at::Tensor channel_filter_grad, at::Tensor spatial_filter_grad){
@@ -87,7 +86,6 @@ int ddf_add_backward_cuda(
     rbottom_grad.resize_({batch_size, bottom_height, bottom_width, channels});
     rspatial_filter_grad.resize_({batch_size, int(top_height/stride), int(top_width/stride), kernel_size*kernel_size});
 
-    //TODO: use head
     DDFAddBackwardLauncher(top_grad, features, channel_filter, spatial_filter,
                            kernel_size, dilation, stride, batch_size,
                            channels, top_height, top_width, bottom_height,

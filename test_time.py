@@ -37,11 +37,11 @@ def test_ddf_op(feat, channel, spatial, num_warm_up=100, num_iters=1000):
     with torch.no_grad():
         for i in range(num_warm_up + num_iters):
             if i < num_warm_up:
-                _ = ddf(feat, channel, spatial, 3, 1, 1, 1, 'mul')
+                _ = ddf(feat, channel, spatial, 3, 1, 1, 'mul')
                 continue
             st = time.time()
             torch.cuda.synchronize()
-            _ = ddf(feat, channel, spatial, 3, 1, 1, 1, 'mul')
+            _ = ddf(feat, channel, spatial, 3, 1, 1, 'mul')
             torch.cuda.synchronize()
             et = time.time() - st
             sum_t += et

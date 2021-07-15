@@ -8,8 +8,8 @@ from ipdb import set_trace
 from ddf import ddf
 
 
-def py_forward(feat, channel_att, spatial_att, kernel_size, dilation, stride, head, kernel_combine):
-    assert dilation == stride == head == 1
+def py_forward(feat, channel_att, spatial_att, kernel_size, dilation, stride, kernel_combine):
+    assert dilation == stride == 1
     B, C, H, W = feat.shape
     out_python = torch.zeros(B, C, H, W, requires_grad=True, device='cuda:0').double()
     for b in range(B):
@@ -36,9 +36,9 @@ spatial_att = torch.randn(1, 9, 15, 15, requires_grad=True, device='cuda:0').dou
 
 
 # check forward
-out_py = py_forward(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul')
-out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'o')
-out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'f')
+out_py = py_forward(feat, channel_att, spatial_att, 3, 1, 1, 'mul')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
 
 
 if(float(((out_py-out_ddf_o) > 1e-10).sum()) == 0):
@@ -59,8 +59,8 @@ feat = torch.randn(96, 64, 56, 56, requires_grad=True, device='cuda:0').double()
 channel_att = torch.randn(96, 64, 3, 3, requires_grad=True, device='cuda:0').double()
 spatial_att = torch.randn(96, 9, 56, 56, requires_grad=True, device='cuda:0').double()
 
-out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'o')
-out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'f')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
 
 if(float(((out_ddf_o-out_ddf_f) > 1e-10).sum()) == 0):
     print(True)
@@ -74,8 +74,8 @@ feat = torch.randn(96, 128, 28, 28, requires_grad=True, device='cuda:0').double(
 channel_att = torch.randn(96, 128, 3, 3, requires_grad=True, device='cuda:0').double()
 spatial_att = torch.randn(96, 9, 28, 28, requires_grad=True, device='cuda:0').double()
 
-out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'o')
-out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'f')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
 
 if(float(((out_ddf_o-out_ddf_f) > 1e-10).sum()) == 0):
     print(True)
@@ -89,8 +89,8 @@ feat = torch.randn(96, 256, 14, 14, requires_grad=True, device='cuda:0').double(
 channel_att = torch.randn(96, 256, 3, 3, requires_grad=True, device='cuda:0').double()
 spatial_att = torch.randn(96, 9, 14, 14, requires_grad=True, device='cuda:0').double()
 
-out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'o')
-out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'f')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
 
 if(float(((out_ddf_o-out_ddf_f) > 1e-10).sum()) == 0):
     print(True)
@@ -104,8 +104,8 @@ feat = torch.randn(96, 512, 7, 7, requires_grad=True, device='cuda:0').double()
 channel_att = torch.randn(96, 512, 3, 3, requires_grad=True, device='cuda:0').double()
 spatial_att = torch.randn(96, 9, 7, 7, requires_grad=True, device='cuda:0').double()
 
-out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'o')
-out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul', 'f')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
 
 if(float(((out_ddf_o-out_ddf_f) > 1e-10).sum()) == 0):
     print(True)
@@ -122,13 +122,13 @@ channel_att = torch.randn(1, 70, 3, 3, requires_grad=True, device='cuda:0').doub
 spatial_att = torch.randn(1, 9, 10, 10, requires_grad=True, device='cuda:0').double()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(1, 9, 5, 5, requires_grad=True, device='cuda:0').double()
@@ -150,13 +150,13 @@ spatial_att = torch.randn(35, 9, 10, 10, requires_grad=True, device='cuda:0').do
 torch.cuda.empty_cache()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(35, 9, 5, 5, requires_grad=True, device='cuda:0').double()
@@ -177,13 +177,13 @@ spatial_att = torch.randn(1, 9, 50, 50, requires_grad=True, device='cuda:0').dou
 torch.cuda.empty_cache()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 3, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(1, 9, 25, 25, requires_grad=True, device='cuda:0').double()
@@ -203,13 +203,13 @@ channel_att = torch.randn(1, 70, 5, 5, requires_grad=True, device='cuda:0').doub
 spatial_att = torch.randn(1, 25, 10, 10, requires_grad=True, device='cuda:0').double()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(1, 25, 5, 5, requires_grad=True, device='cuda:0').double()
@@ -231,13 +231,13 @@ spatial_att = torch.randn(20, 25, 10, 10, requires_grad=True, device='cuda:0').d
 torch.cuda.empty_cache()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(20, 25, 5, 5, requires_grad=True, device='cuda:0').double()
@@ -258,13 +258,13 @@ spatial_att = torch.randn(1, 25, 40, 40, requires_grad=True, device='cuda:0').do
 torch.cuda.empty_cache()
 
 # check backwoard
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'mul'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'mul'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 1, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
-test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 1, 'add'), atol=1e-5, eps=1e-3)
+test = gradcheck(ddf, (feat, channel_att, spatial_att, 5, 2, 1, 'add'), atol=1e-5, eps=1e-3)
 print(test)
 
 spatial_att = torch.randn(1, 25, 20, 20, requires_grad=True, device='cuda:0').double()

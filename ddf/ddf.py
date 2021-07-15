@@ -27,7 +27,7 @@ OP_DICT = {
 class DDFFunction(Function):
     @staticmethod
     def forward(ctx, features, channel_filter, spatial_filter,
-                kernel_size=3, dilation=1, stride=1, head=1, kernel_combine='mul', version=''):
+                kernel_size=3, dilation=1, stride=1, kernel_combine='mul', version=''):
         # check args
         assert features.is_cuda, 'input feature must be a CUDA tensor.'
         assert channel_filter.is_cuda, 'channel_filter must be a CUDA tensor.'
@@ -54,12 +54,11 @@ class DDFFunction(Function):
         assert bs == b and hs == h // stride and ws == w // stride,\
             "spatial_filter size {} does not match feature size {} with stride {}".format(
                 spatial_filter.size(), features.size(), stride)
-        assert cs == kernel_size ** 2 * head,\
-            "spatial_filter size {} does not match kernel size {} and head number {}".format(
-                spatial_filter.size(), kernel_size, head)
+        assert cs == kernel_size ** 2,\
+            "spatial_filter size {} does not match kernel size {}".format(
+                spatial_filter.size(), kernel_size)
 
         assert (kernel_size - 1) % 2 == 0 and kernel_size >= 1 and dilation >= 1 and stride >= 1
-        assert head == 1, 'have not implemented multi-head spatial kernel.'
         assert kernel_combine in {'mul', 'add'}, \
             'only support mul or add combination, instead of {}'.format(kernel_combine)
 
@@ -67,7 +66,6 @@ class DDFFunction(Function):
         ctx.kernel_size = kernel_size
         ctx.dilation = dilation
         ctx.stride = stride
-        ctx.head = head
         ctx.op_type = kernel_combine
 
         # build output tensor
@@ -84,7 +82,7 @@ class DDFFunction(Function):
             op_type = kernel_combine
 
         OP_DICT[op_type].forward(features, channel_filter, spatial_filter,
-                                 kernel_size, dilation, stride, head, output)
+                                 kernel_size, dilation, stride, output)
         if features.requires_grad or channel_filter.requires_grad or spatial_filter.requires_grad:
             ctx.save_for_backward(features, channel_filter, spatial_filter)
         return output
@@ -100,7 +98,6 @@ class DDFFunction(Function):
         kernel_size = ctx.kernel_size
         dilation = ctx.dilation
         stride = ctx.stride
-        head = ctx.head
         op_type = ctx.op_type
 
         features, channel_filter, spatial_filter = ctx.saved_tensors
@@ -112,8 +109,8 @@ class DDFFunction(Function):
         grad_spatial_filter = torch.zeros_like(spatial_filter, requires_grad=False)
 
         # TODO: optimize backward CUDA code.
-        OP_DICT[op_type].backward(grad_output.contiguous(), features, channel_filter, spatial_filter,
-                                  kernel_size, dilation, stride, head,
+        OP_DICT[op_type].backward(grad_output.contiguous(), features, channel_filter,
+                                  spatial_filter, kernel_size, dilation, stride,
                                   rgrad_output, rgrad_input, rgrad_spatial_filter,
                                   grad_input, grad_channel_filter, grad_spatial_filter)
 
@@ -127,10 +124,7 @@ class FilterNorm(nn.Module):
     def __init__(self, in_channels, kernel_size, filter_type,
                  nonlinearity='linear', running_std=False, running_mean=False):
         assert filter_type in ('spatial', 'channel')
-        if filter_type == 'spatial':
-            assert in_channels == 1
-        else:
-            assert in_channels >= 1
+        assert in_channels >= 1
         super(FilterNorm, self).__init__()
         self.in_channels = in_channels
         self.filter_type = filter_type
@@ -148,9 +142,11 @@ class FilterNorm(nn.Module):
 
     def forward(self, x):
         if self.filter_type == 'spatial':
-            b, c, h, w = x.size()
-            x = x - x.mean(dim=1).view(b, 1, h, w)
-            x = x / (x.std(dim=1).view(b, 1, h, w) + 1e-10)
+            b, _, h, w = x.size()
+            x = x.view(b, self.in_channels, -1, h, w)
+            x = x - x.mean(dim=2).view(b, self.in_channels, 1, h, w)
+            x = x / (x.std(dim=2).view(b, self.in_channels, 1, h, w) + 1e-10)
+            x = x.view(b, _, h, w)
             if self.runing_std:
                 x = x * self.std[None, :, None, None]
             else:
@@ -175,30 +171,30 @@ class FilterNorm(nn.Module):
         return x
 
 
-def build_spatial_branch(in_channels, kernel_size,
+def build_spatial_branch(in_channels, kernel_size, head=1,
                          nonlinearity='relu',
                          stride=1, gen_kernel_size=1):
     if gen_kernel_size > 1:
         return nn.Sequential(
             nn.Conv2d(in_channels, in_channels, gen_kernel_size, stride=stride,
                       padding=gen_kernel_size // 2, groups=in_channels),
-            nn.Conv2d(in_channels, kernel_size ** 2, 1),
-            FilterNorm(1, kernel_size, 'spatial', nonlinearity))
+            nn.Conv2d(in_channels, head * kernel_size ** 2, 1),
+            FilterNorm(head, kernel_size, 'spatial', nonlinearity))
     else:
         return nn.Sequential(
-            nn.Conv2d(in_channels, kernel_size ** 2, 1, stride=stride),
-            FilterNorm(1, kernel_size, 'spatial', nonlinearity))
+            nn.Conv2d(in_channels, head * kernel_size ** 2, 1, stride=stride),
+            FilterNorm(head, kernel_size, 'spatial', nonlinearity))
 
 
-def build_channel_branch(in_channels, kernel_size,
+def build_channel_branch(in_channels, kernel_size, head=1,
                          nonlinearity='relu', se_ratio=0.2):
     assert se_ratio > 0
     mid_channels = int(in_channels * se_ratio)
     return nn.Sequential(
         nn.AdaptiveAvgPool2d((1, 1)),
-        nn.Conv2d(in_channels, mid_channels, 1),
+        nn.Conv2d(in_channels, mid_channels * head, 1, groups=head),
         nn.ReLU(True),
-        nn.Conv2d(mid_channels, in_channels * kernel_size ** 2, 1),
+        nn.Conv2d(mid_channels * head, in_channels * kernel_size ** 2, 1, groups=head),
         FilterNorm(in_channels, kernel_size, 'channel', nonlinearity, running_std=True))
 
 
@@ -213,18 +209,22 @@ class DDFPack(nn.Module):
         self.kernel_combine = kernel_combine
 
         self.spatial_branch = build_spatial_branch(
-            in_channels, kernel_size, nonlinearity, stride, gen_kernel_size)
+            in_channels, kernel_size, head, nonlinearity, stride, gen_kernel_size)
 
         self.channel_branch = build_channel_branch(
-            in_channels, kernel_size, nonlinearity, se_ratio)
+            in_channels, kernel_size, head, nonlinearity, se_ratio)
 
     def forward(self, x):
-        b, c = x.shape[:2]
-        channel_filter = self.channel_branch(x).view(b, c, self.kernel_size, self.kernel_size)
-        spatial_filter = self.spatial_branch(x)
-
-        return ddf(x, channel_filter, spatial_filter,
-                   self.kernel_size, self.dilation, self.stride, self.head, self.kernel_combine)
+        b, c, h, w = x.shape
+        g = self.head
+        k = self.kernel_size
+        s = self.stride
+        channel_filter = self.channel_branch(x).view(b*g, c//g, k, k)
+        spatial_filter = self.spatial_branch(x).view(b*g, -1, h//s, w//s)
+        x = x.view(b*g, c//g, h, w)
+        out = ddf(x, channel_filter, spatial_filter,
+                  self.kernel_size, self.dilation, self.stride, self.kernel_combine)
+        return out.view(b, c, h//s, w//s)
 
 
 class DDFUpPack(nn.Module):
@@ -248,22 +248,25 @@ class DDFUpPack(nn.Module):
             # build spatial branches
             self.spatial_branch.append(
                 build_spatial_branch(
-                    joint_channels, kernel_size, nonlinearity, 1, gen_kernel_size))
+                    joint_channels, kernel_size, head, nonlinearity, 1, gen_kernel_size))
 
             self.channel_branch.append(
                 build_channel_branch(
-                    in_channels, kernel_size, nonlinearity, se_ratio))
+                    in_channels, kernel_size, head, nonlinearity, se_ratio))
 
     def forward(self, x, joint_x=None):
         joint_x = x if joint_x is None else joint_x
         outs = []
+        b, c, h, w = x.shape
+        g = self.head
+        k = self.kernel_size
+        _x = x.view(b*g, c//g, h, w)
         for s_b, c_b in zip(self.spatial_branch, self.channel_branch):
-            b, c = x.shape[:2]
-            channel_filter = c_b(x).view(b, c, self.kernel_size, self.kernel_size)
-            spatial_filter = s_b(joint_x)
-            o = ddf(x, channel_filter, spatial_filter,
+            channel_filter = c_b(x).view(b*g, c//g, k, k)
+            spatial_filter = s_b(joint_x).view(b*g, c//g, h, w)
+            o = ddf(_x, channel_filter, spatial_filter,
                     self.kernel_size, self.dilation, 1, self.head, self.kernel_combine).type_as(x)
-            outs.append(o)
+            outs.append(o.view(b, c, h, w))
         out = torch.stack(outs, dim=2)
         out = out.view(out.size(0), -1, out.size(-2), out.size(-1))
         return F.pixel_shuffle(out, self.scale_factor)
