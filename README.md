@@ -36,14 +36,14 @@ For example, you can get a carafe/involution-like module by fixing all values in
 ```python
 channel_filter = torch.ones(filter_size)
 output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'mul')
+             kernel_size, dilation, stride, 'mul')
 ```
 or
 
 ```python
 channel_filter = torch.zeros(filter_size)
 output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'add')
+             kernel_size, dilation, stride, 'add')
 ```
 
 Similarly, you can get a WeightNet-like depthwise filter by fixing all values in the spatial filter to 1 for 'mul' combination or 0 for 'add' combination.
@@ -52,14 +52,14 @@ Similarly, you can get a WeightNet-like depthwise filter by fixing all values in
 ```python
 spatial_filter = torch.ones(filter_size)
 output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'mul')
+             kernel_size, dilation, stride, 'mul')
 ```
 or
 
 ```python
 spatial_filter = torch.zeros(filter_size)
 output = ddf(input, channel_filter, spatial_filter,
-             kernel_size, dilation, stride, head, 'add')
+             kernel_size, dilation, stride, 'add')
 ```
 
 Almost ALL exisitng weight-dynamic depthwise operation (not grid-dynamic like deformable convolution) can be implemented by our ddf operation. Have fun exploring.
