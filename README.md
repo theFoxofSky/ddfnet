@@ -24,7 +24,7 @@ Please refer to our [project page](https://thefoxofsky.github.io/project_pages/d
 
 The code for baidu is `vub3`
 
-## Use ddf in other places as a basic building layer
+## Use ddf as a basic building layer
 
 Please directly copy the ddf folder to your repo and build the ddf operation.
 Then, you can easily import the ddf operation, the DDFPack, and the DDFUpPack. 
