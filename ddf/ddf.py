@@ -143,10 +143,10 @@ class FilterNorm(nn.Module):
     def forward(self, x):
         if self.filter_type == 'spatial':
             b, _, h, w = x.size()
-            x = x.view(b, self.in_channels, -1, h, w)
-            x = x - x.mean(dim=2).view(b, self.in_channels, 1, h, w)
-            x = x / (x.std(dim=2).view(b, self.in_channels, 1, h, w) + 1e-10)
-            x = x.view(b, _, h, w)
+            x = x.reshape(b, self.in_channels, -1, h, w)
+            x = x - x.mean(dim=2).reshape(b, self.in_channels, 1, h, w)
+            x = x / (x.std(dim=2).reshape(b, self.in_channels, 1, h, w) + 1e-10)
+            x = x.reshape(b, _, h, w)
             if self.runing_std:
                 x = x * self.std[None, :, None, None]
             else:
@@ -156,10 +156,10 @@ class FilterNorm(nn.Module):
         elif self.filter_type == 'channel':
             b = x.size(0)
             c = self.in_channels
-            x = x.view(b, c, -1)
-            x = x - x.mean(dim=2).view(b, c, 1)
-            x = x / (x.std(dim=2).view(b, c, 1) + 1e-10)
-            x = x.view(b, -1)
+            x = x.reshape(b, c, -1)
+            x = x - x.mean(dim=2).reshape(b, c, 1)
+            x = x / (x.std(dim=2).reshape(b, c, 1) + 1e-10)
+            x = x.reshape(b, -1)
             if self.runing_std:
                 x = x * self.std[None, :]
             else:
@@ -219,12 +219,12 @@ class DDFPack(nn.Module):
         g = self.head
         k = self.kernel_size
         s = self.stride
-        channel_filter = self.channel_branch(x).view(b*g, c//g, k, k)
-        spatial_filter = self.spatial_branch(x).view(b*g, -1, h//s, w//s)
-        x = x.view(b*g, c//g, h, w)
+        channel_filter = self.channel_branch(x).reshape(b*g, c//g, k, k)
+        spatial_filter = self.spatial_branch(x).reshape(b*g, -1, h//s, w//s)
+        x = x.reshape(b*g, c//g, h, w)
         out = ddf(x, channel_filter, spatial_filter,
                   self.kernel_size, self.dilation, self.stride, self.kernel_combine)
-        return out.view(b, c, h//s, w//s)
+        return out.reshape(b, c, h//s, w//s)
 
 
 class DDFUpPack(nn.Module):
@@ -260,13 +260,13 @@ class DDFUpPack(nn.Module):
         b, c, h, w = x.shape
         g = self.head
         k = self.kernel_size
-        _x = x.view(b*g, c//g, h, w)
+        _x = x.reshape(b*g, c//g, h, w)
         for s_b, c_b in zip(self.spatial_branch, self.channel_branch):
-            channel_filter = c_b(x).view(b*g, c//g, k, k)
-            spatial_filter = s_b(joint_x).view(b*g, c//g, h, w)
+            channel_filter = c_b(x).reshape(b*g, c//g, k, k)
+            spatial_filter = s_b(joint_x).reshape(b*g, c//g, h, w)
             o = ddf(_x, channel_filter, spatial_filter,
                     self.kernel_size, self.dilation, 1, self.head, self.kernel_combine).type_as(x)
-            outs.append(o.view(b, c, h, w))
+            outs.append(o.reshape(b, c, h, w))
         out = torch.stack(outs, dim=2)
-        out = out.view(out.size(0), -1, out.size(-2), out.size(-1))
+        out = out.reshape(out.size(0), -1, out.size(-2), out.size(-1))
         return F.pixel_shuffle(out, self.scale_factor)
