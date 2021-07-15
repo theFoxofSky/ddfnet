@@ -20,7 +20,7 @@ Please refer to our [project page](https://thefoxofsky.github.io/project_pages/d
 | ddf_mul_resnet50  |  16.8M  | ImageNet 1K |     224    |   79.1   | [google](https://drive.google.com/file/d/14voC4WqvWbdMUrep3bjVw_S-_LUejtLX/view?usp=sharing) / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
 | ddf_mul_resnet101 |  28.1M  | ImageNet 1K |     224    |   80.5   | [google](https://drive.google.com/file/d/1zakOCCozqxKuD92bJUULivNnJ5CX4EEC/view?usp=sharing) / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
 | ddf_add_resnet50  |  16.8M  | ImageNet 1K |     224    |   78.8   | [google](https://drive.google.com/file/d/1CT2e8c640Yn5givImj0XdDtc4dkHwAz0/view?usp=sharing) / [baidu](https://pan.baidu.com/s/1hKGiv9nGSIw_czhm6auJxQ) |
-| ddf_add_resnet101 |  28.1M  | ImageNet 1K |     224    |   79.9   | google / [baidu](https://pan.baidu.com/s/11CL367cR-e4e460EkQvQzw) |
+| ddf_add_resnet101 |  28.1M  | ImageNet 1K |     224    |   79.9   | [baidu](https://pan.baidu.com/s/11CL367cR-e4e460EkQvQzw) |
 
 The code for baidu is `vub3`
 
