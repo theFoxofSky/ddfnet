@@ -188,15 +188,15 @@ def build_spatial_branch(in_channels, kernel_size, head=1,
             FilterNorm(head, kernel_size, 'spatial', nonlinearity))
 
 
-def build_channel_branch(in_channels, kernel_size, head=1,
+def build_channel_branch(in_channels, kernel_size,
                          nonlinearity='relu', se_ratio=0.2):
     assert se_ratio > 0
     mid_channels = int(in_channels * se_ratio)
     return nn.Sequential(
         nn.AdaptiveAvgPool2d((1, 1)),
-        nn.Conv2d(in_channels, mid_channels * head, 1, groups=head),
+        nn.Conv2d(in_channels, mid_channels, 1),
         nn.ReLU(True),
-        nn.Conv2d(mid_channels * head, in_channels * kernel_size ** 2, 1, groups=head),
+        nn.Conv2d(mid_channels, in_channels * kernel_size ** 2, 1),
         FilterNorm(in_channels, kernel_size, 'channel', nonlinearity, running_std=True))
 
 
@@ -214,7 +214,7 @@ class DDFPack(nn.Module):
             in_channels, kernel_size, head, nonlinearity, stride, gen_kernel_size)
 
         self.channel_branch = build_channel_branch(
-            in_channels, kernel_size, head, nonlinearity, se_ratio)
+            in_channels, kernel_size, nonlinearity, se_ratio)
 
     def forward(self, x):
         b, c, h, w = x.shape
@@ -254,7 +254,7 @@ class DDFUpPack(nn.Module):
 
             self.channel_branch.append(
                 build_channel_branch(
-                    in_channels, kernel_size, head, nonlinearity, se_ratio))
+                    in_channels, kernel_size, nonlinearity, se_ratio))
 
     def forward(self, x, joint_x=None):
         joint_x = x if joint_x is None else joint_x
