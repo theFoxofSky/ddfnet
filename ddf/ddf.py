@@ -36,7 +36,9 @@ class DDFFunction(Function):
         # TODO: fix CUDA code to support HALF operation
         if features.dtype == torch.float16:
             features = features.float()
+        if channel_filter.dtype == torch.float16:
             channel_filter = channel_filter.float()
+        if spatial_filter.dtype == torch.float16:
             spatial_filter = spatial_filter.float()
 
         # check channel_filter size
