@@ -204,6 +204,7 @@ class DDFPack(nn.Module):
     def __init__(self, in_channels, kernel_size=3, stride=1, dilation=1, head=1,
                  se_ratio=0.2, nonlinearity='relu', gen_kernel_size=1, kernel_combine='mul'):
         super(DDFPack, self).__init__()
+        assert kernel_size > 1
         self.kernel_size = kernel_size
         self.stride = stride
         self.dilation = dilation
