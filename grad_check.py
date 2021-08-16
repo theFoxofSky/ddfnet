@@ -9,7 +9,7 @@ from ddf import ddf
 
 
 def py_forward(feat, channel_att, spatial_att, kernel_size, dilation, stride, kernel_combine):
-    assert dilation == stride == 1
+    assert stride == 1
     B, C, H, W = feat.shape
     out_python = torch.zeros(B, C, H, W, requires_grad=True, device='cuda:0').double()
     for b in range(B):
@@ -18,7 +18,7 @@ def py_forward(feat, channel_att, spatial_att, kernel_size, dilation, stride, ke
                 for x in range(W):
                     for iy in range(kernel_size):
                         for ix in range(kernel_size):
-                            if y+iy-kernel_size//2 < 0 or y+iy-kernel_size//2 >= H or x+ix-kernel_size//2 < 0 or x+ix-kernel_size//2 >= W:
+                            if y+(iy-kernel_size//2)*dilation < 0 or y+(iy-kernel_size//2)*dilation >= H or x+(ix-kernel_size//2)*dilation < 0 or x+(ix-kernel_size//2)*dilation >= W:
                                 continue
                             if kernel_combine == 'mul':
                                 _combined_kernel = channel_att[b, c, iy, ix] * spatial_att[
@@ -26,7 +26,7 @@ def py_forward(feat, channel_att, spatial_att, kernel_size, dilation, stride, ke
                             else:
                                 _combined_kernel = channel_att[b, c, iy, ix] + spatial_att[
                                     b, iy * kernel_size + ix, y, x]
-                            out_python[b, c, y, x] += _combined_kernel * feat[b, c, y+iy-kernel_size//2, x+ix-kernel_size//2]
+                            out_python[b, c, y, x] += _combined_kernel * feat[b, c, y+(iy-kernel_size//2)*dilation, x+(ix-kernel_size//2)*dilation]
     return out_python
 
 
@@ -36,6 +36,25 @@ spatial_att = torch.randn(1, 9, 15, 15, requires_grad=True, device='cuda:0').dou
 
 
 # check forward
+out_py = py_forward(feat, channel_att, spatial_att, 3, 2, 1, 'mul')
+out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 2, 1, 'mul', 'o')
+out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 2, 1, 'mul', 'f')
+
+
+if(float(((out_py-out_ddf_o) > 1e-10).sum()) == 0):
+    print(True)
+else:
+    set_trace()
+    exit(1)
+
+if(float(((out_py-out_ddf_f) > 1e-10).sum()) == 0):
+    print(True)
+else:
+    set_trace()
+    exit(1)
+
+torch.cuda.empty_cache()
+
 out_py = py_forward(feat, channel_att, spatial_att, 3, 1, 1, 'mul')
 out_ddf_o = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'o')
 out_ddf_f = ddf(feat, channel_att, spatial_att, 3, 1, 1, 'mul', 'f')
