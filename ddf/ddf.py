@@ -266,7 +266,7 @@ class DDFUpPack(nn.Module):
         _x = x.reshape(b*g, c//g, h, w)
         for s_b, c_b in zip(self.spatial_branch, self.channel_branch):
             channel_filter = c_b(x).reshape(b*g, c//g, k, k)
-            spatial_filter = s_b(joint_x).reshape(b*g, c//g, h, w)
+            spatial_filter = s_b(joint_x).reshape(b*g, -1, h, w)
             o = ddf(_x, channel_filter, spatial_filter,
                     self.kernel_size, self.dilation, 1, self.head, self.kernel_combine).type_as(x)
             outs.append(o.reshape(b, c, h, w))

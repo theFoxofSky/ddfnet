@@ -19,8 +19,8 @@ using namespace at;  // temporal fix for pytorch<=0.4.1 (see #9848)
 #define MAX_SHARED_SCALAR_T 6144  // 49152 / 8 = 6144
 #define kTileDim 32
 #define kBlockRows 8
-#define FORWARD_WARP_SIZE 16
-#define FORWARD_THREADS_PER_PIXEL 64
+#define FORWARD_WARP_SIZE 32
+#define FORWARD_THREADS_PER_PIXEL 32
 #define FULL_MASK 0xffffffff
 
 inline int divideUP(const int x, const int y) { return (((x) + (y)-1) / (y)); }
