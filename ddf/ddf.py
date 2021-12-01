@@ -241,6 +241,7 @@ class DDFUpPack(nn.Module):
 
         self.spatial_branch = nn.ModuleList()
         self.channel_branch = nn.ModuleList()
+        self.scale_factor = scale_factor
 
         if joint_channels > 0:
             gen_kernel_size = max(gen_kernel_size, 3)
