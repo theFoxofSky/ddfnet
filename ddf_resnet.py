@@ -35,7 +35,7 @@ class DDFMulBottleneck(Bottleneck):
     def __init__(self, inplanes, planes, stride=1, downsample=None, cardinality=1, base_width=64,
                  reduce_first=1, dilation=1, first_dilation=None, act_layer=nn.ReLU, norm_layer=nn.BatchNorm2d,
                  attn_layer=None, aa_layer=None, drop_block=None, drop_path=None,
-                 se_ratio=0.2, gen_kernel_size=1):  # new args
+                 se_ratio=0.2):  # new args
         assert reduce_first == 1
         super(DDFMulBottleneck, self).__init__(
             inplanes, planes, stride, downsample, cardinality, base_width,
@@ -44,15 +44,14 @@ class DDFMulBottleneck(Bottleneck):
         width = int(math.floor(planes * (base_width / 64)) * cardinality)
         use_aa = aa_layer is not None and (stride == 2 or first_dilation != dilation)
         self.conv2 = DDFPack(width, kernel_size=3, stride=1 if use_aa else stride,
-                             dilation=first_dilation, se_ratio=se_ratio,
-                             gen_kernel_size=gen_kernel_size, kernel_combine='mul')
+                             dilation=first_dilation, se_ratio=se_ratio, kernel_combine='mul')
 
 
 class DDFAddBottleneck(Bottleneck):
     def __init__(self, inplanes, planes, stride=1, downsample=None, cardinality=1, base_width=64,
                  reduce_first=1, dilation=1, first_dilation=None, act_layer=nn.ReLU, norm_layer=nn.BatchNorm2d,
                  attn_layer=None, aa_layer=None, drop_block=None, drop_path=None,
-                 se_ratio=0.2, gen_kernel_size=1):  # new args
+                 se_ratio=0.2):  # new args
         assert reduce_first == 1
         super(DDFAddBottleneck, self).__init__(
             inplanes, planes, stride, downsample, cardinality, base_width,
@@ -61,8 +60,7 @@ class DDFAddBottleneck(Bottleneck):
         width = int(math.floor(planes * (base_width / 64)) * cardinality)
         use_aa = aa_layer is not None and (stride == 2 or first_dilation != dilation)
         self.conv2 = DDFPack(width, kernel_size=3, stride=1 if use_aa else stride,
-                             dilation=first_dilation, se_ratio=se_ratio,
-                             gen_kernel_size=gen_kernel_size, kernel_combine='add')
+                             dilation=first_dilation, se_ratio=se_ratio, kernel_combine='add')
 
 
 @register_model

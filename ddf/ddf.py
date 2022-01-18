@@ -174,18 +174,10 @@ class FilterNorm(nn.Module):
 
 
 def build_spatial_branch(in_channels, kernel_size, head=1,
-                         nonlinearity='relu',
-                         stride=1, gen_kernel_size=1):
-    if gen_kernel_size > 1:
-        return nn.Sequential(
-            nn.Conv2d(in_channels, in_channels, gen_kernel_size, stride=stride,
-                      padding=gen_kernel_size // 2, groups=in_channels),
-            nn.Conv2d(in_channels, head * kernel_size ** 2, 1),
-            FilterNorm(head, kernel_size, 'spatial', nonlinearity))
-    else:
-        return nn.Sequential(
-            nn.Conv2d(in_channels, head * kernel_size ** 2, 1, stride=stride),
-            FilterNorm(head, kernel_size, 'spatial', nonlinearity))
+                         nonlinearity='relu', stride=1):
+    return nn.Sequential(
+        nn.Conv2d(in_channels, head * kernel_size ** 2, 1, stride=stride),
+        FilterNorm(head, kernel_size, 'spatial', nonlinearity))
 
 
 def build_channel_branch(in_channels, kernel_size,
@@ -202,7 +194,7 @@ def build_channel_branch(in_channels, kernel_size,
 
 class DDFPack(nn.Module):
     def __init__(self, in_channels, kernel_size=3, stride=1, dilation=1, head=1,
-                 se_ratio=0.2, nonlinearity='relu', gen_kernel_size=1, kernel_combine='mul'):
+                 se_ratio=0.2, nonlinearity='relu', kernel_combine='mul'):
         super(DDFPack, self).__init__()
         assert kernel_size > 1
         self.kernel_size = kernel_size
@@ -212,7 +204,7 @@ class DDFPack(nn.Module):
         self.kernel_combine = kernel_combine
 
         self.spatial_branch = build_spatial_branch(
-            in_channels, kernel_size, head, nonlinearity, stride, gen_kernel_size)
+            in_channels, kernel_size, head, nonlinearity, stride)
 
         self.channel_branch = build_channel_branch(
             in_channels, kernel_size, nonlinearity, se_ratio)
@@ -232,7 +224,7 @@ class DDFPack(nn.Module):
 
 class DDFUpPack(nn.Module):
     def __init__(self, in_channels, kernel_size=3, scale_factor=2, dilation=1, head=1, se_ratio=0.2,
-                 nonlinearity='linear', gen_kernel_size=1, joint_channels=-1, kernel_combine='mul'):
+                 nonlinearity='linear', dw_kernel_size=3, joint_channels=-1, kernel_combine='mul'):
         super(DDFUpPack, self).__init__()
         self.kernel_size = kernel_size
         self.dilation = dilation
@@ -243,16 +235,20 @@ class DDFUpPack(nn.Module):
         self.spatial_branch = nn.ModuleList()
         self.channel_branch = nn.ModuleList()
 
-        if joint_channels > 0:
-            gen_kernel_size = max(gen_kernel_size, 3)
-        else:
-            joint_channels = in_channels
-
         for i in range(scale_factor ** 2):
             # build spatial branches
-            self.spatial_branch.append(
-                build_spatial_branch(
-                    joint_channels, kernel_size, head, nonlinearity, 1, gen_kernel_size))
+            if joint_channels < 1:
+                dw_kernel_size = max(dw_kernel_size, 3)
+                self.spatial_branch.append(
+                    nn.Sequential(
+                        nn.Conv2d(in_channels, in_channels, dw_kernel_size,
+                                  padding=kernel_size//2, groups=in_channels),
+                        build_spatial_branch(
+                            in_channels, kernel_size, head, nonlinearity, 1)))
+            else:
+                self.spatial_branch.append(
+                    build_spatial_branch(
+                        in_channels, kernel_size, head, nonlinearity, 1))
 
             self.channel_branch.append(
                 build_channel_branch(
