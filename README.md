@@ -11,7 +11,7 @@ We illustrate the DDF operation and the DDF module. The orange color denotes spa
 / branch, and the green color denotes channel dynamic filters / branch. The filter application means applying 
 the convolution operation at a single position. ‘GAP’ means the global average pooling and ‘FC’ denotes the fully connected layer.
 
-Please refer to our [project page](https://thefoxofsky.github.io/project_pages/ddf) and [paper](https://arxiv.org/abs/2104.14107) for more details.
+Please refer to our [project page](https://thefoxofsky.github.io/project_pages/DDF/ddf) and [paper](https://arxiv.org/abs/2104.14107) for more details.
 
 ## Model zoo
 
